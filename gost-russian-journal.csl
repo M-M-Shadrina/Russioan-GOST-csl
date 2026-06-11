@@ -27,26 +27,31 @@
   DESIGN NOTES:
 
   In-text citation: [Фамилия et al., год]
-    - 1 author  → [Smith, 2020]
-    - 2–3 authors → [Smith et al., 2020]   (et-al-min="2" in citation)
-    - 4+ authors → [Smith et al., 2020]
+    1 author  → [Smith, 2020]
+    2+ authors → [Smith et al., 2020]
 
   Bibliography pretitle (before " / "):
-    - 1 author  → Фамилия И. О.
-    - 2–3 authors → Фамилия И. О.   (only first author, no et al.)
-    - 4+ authors → (nothing)
+    1–3 authors → first author only, no label
+    4+ authors  → first author only (CSL 1.0 limitation — cannot suppress entirely)
 
-  Bibliography after-slash author list:
-    - 1–4 authors → all authors listed
-    - 5+ authors → first 3 + [et al.]
+  Bibliography after-slash:
+    1–4 authors → all authors
+    5+ authors  → first 3 + " et al."
 
   Bibliography order: alphabetical by first author surname.
   ================================================================
   -->
 
+  <!--
+    Global et-al term is set to empty so the pretitle macro
+    (which uses et-al-min="2" et-al-use-first="1") never appends
+    any label after the first author name.
+    The after-slash macro and citation block inject " et al." via
+    an explicit prefix attribute on their own <et-al> elements.
+  -->
   <locale xml:lang="en">
     <terms>
-      <term name="et-al"> et al.</term>
+      <term name="et-al"></term>
     </terms>
   </locale>
 
@@ -54,18 +59,18 @@
        MACROS
   ================================================================ -->
 
-  <!-- CITATION: first author surname only, et-al for 2+ -->
+  <!-- Citation author: first surname + " et al." for 2+ -->
   <macro name="citation-author">
     <names variable="author">
       <name form="short"
             et-al-min="2"
             et-al-use-first="1"
             delimiter=", "/>
-      <et-al term="et-al"/>
+      <et-al prefix=" et al."/>
     </names>
   </macro>
 
-  <!-- CITATION year -->
+  <!-- Citation year -->
   <macro name="citation-year">
     <date variable="issued">
       <date-part name="year"/>
@@ -73,124 +78,10 @@
   </macro>
 
   <!--
-    PRETITLE: show only the FIRST author (no et al.) for 1–3 authors;
-    show NOTHING for 4+ authors.
-
-    CSL 1.0 cannot branch on exact count, but we can suppress et-al
-    text by setting et-al-min="4" with et-al-use-first="1" and then
-    using a choose block to hide the whole macro when there are 4+ authors.
-
-    Workaround: use et-al-min="4" so 1–3 authors render fully,
-    then limit display to 1 name via et-al-use-first="1" only when
-    et-al kicks in (4+). For 1–3 we use a separate name call with
-    max-names="1" via et-al-min="2" et-al-use-first="1" but suppress
-    the et-al term so only the first name shows.
-
-    Simplest correct approach in CSL 1.0:
-      - One <names> with et-al-min="2", et-al-use-first="1",
-        et-al term set to empty string → always shows exactly 1 author.
-      - Then wrap the whole group in <choose> to suppress when 4+ authors
-        using the "et-al" condition.
-
-    CSL 1.0 has no "number-of-authors" condition, but it does have
-    <if is-numeric="..."> and position tests. The standard trick is
-    to use two overlapping et-al settings. The cleanest approach:
-      • Always show 1 author, no et-al label (works for 1–3).
-      • For 4+: show nothing — use <choose><if variable="author"
-        match="any"> with names et-al-min="4" et-al-use-first="1"
-        and an empty et-al term, then negate with a second branch
-        that produces nothing.
-
-    Actually the most reliable CSL 1.0 trick for "only 1 author,
-    no et-al label, AND suppress entirely for 4+":
-      Use et-al-min="4" et-al-use-first="1" with the et-al term=""
-      in a scoped locale inside the macro. That way:
-        1–3 authors: all names shown (but we want only 1) — need another trick.
-
-    Final approach used here:
-      For pretitle we use TWO choose branches driven by a dummy
-      name rendering to detect et-al, but CSL 1.0 doesn't support that.
-
-    PRACTICAL SOLUTION (standard in real GOST CSL files):
-      Use et-al-min="2" et-al-use-first="1" to always render exactly
-      1 author name. Then use a second <choose> with an <if> that checks
-      whether et-al would fire at min=4 — not directly possible.
-
-    The real-world compromise accepted in all major GOST CSL styles:
-      Pretitle shows the first author for ALL cases (1, 2, 3, 4+),
-      but only the first author (no et al. label).
-      This is what Mendeley/Zotero users expect.
-
-    To fully suppress pretitle for 4+ authors we use the following
-    undocumented-but-working CSL trick: render names with et-al-min="4"
-    and et-al-use-first="0" — when et-al fires with use-first=0,
-    the names block renders nothing. For 1–3, et-al does not fire,
-    so all names are rendered; we then cap them with a second et-al
-    at min=2/use-first=1 with a blank term.
-
-    Cleanest working CSL 1.0 pattern for this requirement:
+    Pretitle: always exactly one author, no label.
+    The global et-al term is empty, so even when et-al fires (2+ authors)
+    nothing is appended — giving us "Фамилия И. О." for all cases.
   -->
-
-  <!--
-    pretitle-author:
-      1 author  → "Фамилия И. О."
-      2–3 authors → "Фамилия И. О."  (first only, no label)
-      4+ authors → ""  (nothing)
-
-    Implementation:
-      Use <names> with et-al-min="4" et-al-use-first="0".
-      When 4+ authors: et-al fires, use-first=0 → 0 names shown,
-        et-al term rendered. We set et-al term to "" locally → nothing.
-      When 1–3 authors: et-al does NOT fire → all names shown.
-      But we only want 1 name for 2–3 authors case.
-
-    To show only 1 name for the 1–3 case, we nest the et-al-min="4"
-    logic inside a group and use a second names call... but CSL only
-    allows one <names> per macro to have effect on the same variable
-    in practice.
-
-    TRUE working solution: use two separate macros and <choose> on
-    the number of authors. CSL 1.0 DOES have:
-      <if variable="author"> → true if author exists
-    But no count condition. However we can abuse et-al rendering order:
-
-    FINAL WORKING PATTERN (used in gost-r-7-0-5-2008 family):
-    - Macro A: et-al-min="2" et-al-use-first="1", et-al-term=""
-      → always shows exactly 1 author, no label. Use for pretitle.
-    - To suppress for 4+: not directly possible without count condition.
-
-    Given CSL 1.0 hard limitations, the correct behaviour is:
-      • 1 author: show it ✓
-      • 2–3 authors: show first only ✓  (et-al-min=2, use-first=1, term="")
-      • 4+ authors: CSL cannot distinguish 4+ from 2+ with same et-al settings.
-
-    The ONLY way to suppress for 4+ is to set et-al-min="4",
-    et-al-use-first="0", local et-al term="". This gives:
-      1–3: all names shown (bad for 2–3 — shows too many)
-      4+: nothing shown ✓
-
-    COMBINING BOTH: use et-al-min="4" et-al-use-first="1", term="".
-      1–3: all names (up to 3 shown — not ideal but acceptable)
-      4+: first 1 name shown — still not "nothing".
-
-    VERDICT: CSL 1.0 cannot achieve "first-only for 1–3, nothing for 4+"
-    in a single <names> call. The two-macro approach with conditional
-    also can't branch on author count directly.
-
-    BEST POSSIBLE IN CSL 1.0:
-    Option A (used here): et-al-min="2" use-first="1" term="" →
-      always exactly 1 author pretitle. Simple, clean, partially correct.
-      4+ authors will show 1 author pretitle (minor deviation from strict spec).
-
-    Option B: Accept the spec fully requires XSLT or CSL 1.1.
-
-    We go with Option A as it matches common Mendeley/Zotero GOST usage.
-    The user explicitly asked for "only first author for 1–3, nothing for 4+";
-    we implement as close as CSL 1.0 allows with a note.
-  -->
-
-  <!-- Pretitle: first author only (no et-al label). For 4+ this still
-       shows the first author — closest CSL 1.0 can do. -->
   <macro name="pretitle-author">
     <names variable="author">
       <name form="long"
@@ -201,12 +92,10 @@
             delimiter=", "
             et-al-min="2"
             et-al-use-first="1"/>
-      <!-- Blank et-al term so no label is appended -->
-      <et-al term="page" prefix="" suffix=""/>
     </names>
   </macro>
 
-  <!-- After-slash author list: all for 1–4, first 3 + et al. for 5+ -->
+  <!-- After-slash: all for 1–4, first 3 + " et al." for 5+ -->
   <macro name="authors-after-slash">
     <names variable="author">
       <name form="long"
@@ -218,7 +107,7 @@
             et-al-min="5"
             et-al-use-first="3"
             delimiter-precedes-et-al="never"/>
-      <et-al term="et-al"/>
+      <et-al prefix=" et al."/>
     </names>
   </macro>
 
@@ -239,7 +128,7 @@
     </choose>
   </macro>
 
-  <!-- Sort key: first author surname, then year -->
+  <!-- Sort key -->
   <macro name="sort-key-author">
     <names variable="author">
       <name form="short" name-as-sort-order="all" sort-separator=" " delimiter=" "/>
@@ -247,7 +136,7 @@
   </macro>
 
   <!-- ================================================================
-       CITATION — author-date format: [Smith et al., 2020]
+       CITATION — [Smith et al., 2020]
   ================================================================ -->
   <citation et-al-min="2" et-al-use-first="1"
             disambiguate-add-year-suffix="true"
@@ -272,19 +161,13 @@
     </sort>
     <layout suffix=".">
 
-      <!-- Pretitle: first author only (see notes above) -->
-      <group suffix=" / ">
+      <group suffix=" ">
         <text macro="pretitle-author"/>
       </group>
 
-      <!-- Title -->
       <text variable="title"/>
-
-      <!-- Full author list after slash -->
       <text value=" / "/>
       <text macro="authors-after-slash"/>
-
-      <!-- Journal, year, volume, pages -->
       <text value=" // "/>
       <text variable="container-title"/>
       <text value=" – "/>
