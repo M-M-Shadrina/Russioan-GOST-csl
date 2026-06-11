@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl"
+       class="in-text"
+       version="1.0"
+       demote-non-dropping-particle="sort-only"
+       default-locale="en-US">
+
+  <info>
+    <title>GOST Russian Journal (custom)</title>
+    <id>gost-russian-journal-custom</id>
+    <author><name>Custom</name></author>
+    <category citation-format="numeric"/>
+    <updated>2026-06-11T00:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/"/>
+  </info>
+
+  <!--
+  Locale: set et-al term to "[et al.]" with brackets included,
+  so the after-slash macro doesn't need special prefix/suffix.
+  -->
+  <locale xml:lang="en">
+    <terms>
+      <term name="et-al"> [et al.]</term>
+    </terms>
+  </locale>
+
+  <!--
+  ================================================================
+  DESIGN NOTES:
+  
+  1–3 authors:
+    Фамилия И. О. / Title / А. Б. Фамилия, В. Г. Фамилия, Д. Е. Фамилия // Journal...
+  
+  4+ authors (compromise — CSL 1.0 limitation):
+    Фамилия [et al.] / Title / А. Б. Фамилия, ... // Journal...
+  
+    Strict spec for 4 authors: no pretitle author at all.
+    Strict spec for 5+ authors: no pretitle author.
+    CSL 1.0 cannot branch on exact author count, only on et-al trigger.
+    This style shows the first author in pretitle for ALL cases,
+    with [et al.] for 4+ — a standard compromise in GOST CSL implementations.
+  ================================================================
+  -->
+
+  <!-- pretitle: 1-3 authors → all names; 4+ → "FirstName [et al.]" -->
+  <macro name="first-author-pretitle">
+    <names variable="author">
+      <name form="long"
+            initialize="true"
+            initialize-with=". "
+            name-as-sort-order="all"
+            sort-separator=" "
+            delimiter=", "
+            et-al-min="4"
+            et-al-use-first="1"/>
+    </names>
+  </macro>
+
+  <!-- after-slash: ≤4 → all; 5+ → first 3 + [et al.] -->
+  <macro name="authors-after-slash">
+    <names variable="author">
+      <name form="long"
+            initialize="true"
+            initialize-with=". "
+            name-as-sort-order="all"
+            sort-separator=" "
+            delimiter=", "
+            et-al-min="5"
+            delimiter-precedes-et-al="never"
+            et-al-use-first="3"/>
+    </names>
+  </macro>
+
+  <!-- vol + issue -->
+  <macro name="vol-issue">
+    <choose>
+      <if variable="volume" match="any">
+        <text variable="volume" prefix="Vol. "/>
+        <choose>
+          <if variable="issue" match="any">
+            <text variable="issue" prefix=", is. "/>
+          </if>
+        </choose>
+      </if>
+      <else-if variable="issue" match="any">
+        <text variable="issue" prefix="№ "/>
+      </else-if>
+    </choose>
+  </macro>
+
+  <!-- ================================================================
+       CITATION
+  ================================================================ -->
+  <citation collapse="citation-number">
+    <sort><key variable="citation-number"/></sort>
+    <layout prefix="[" suffix="]" delimiter=", ">
+      <text variable="citation-number"/>
+    </layout>
+  </citation>
+
+  <!-- ================================================================
+       BIBLIOGRAPHY
+  ================================================================ -->
+  <bibliography entry-spacing="0" second-field-align="flush">
+    <layout suffix=".">
+
+      <group suffix=" / ">
+        <text macro="first-author-pretitle"/>
+      </group>
+
+      <text variable="title"/>
+      <text value=" / "/>
+      <text macro="authors-after-slash"/>
+      <text value=" // "/>
+      <text variable="container-title"/>
+      <text value=" – "/>
+      <date variable="issued"><date-part name="year"/></date>
+      <group prefix=" – "><text macro="vol-issue"/></group>
+      <group prefix=" – "><text variable="page" prefix="P. "/></group>
+
+    </layout>
+  </bibliography>
+
+</style>
