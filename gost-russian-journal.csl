@@ -57,7 +57,7 @@
             delimiter=", "
             et-al-min="2"
             et-al-use-first="1"/>
-      <et-al term="pupunya" prefix="" suffix=""/>
+      <et-al term="page" prefix="PUPUNECHKA" suffix=""/>
     </names>
   </macro>
 
@@ -146,3 +146,4 @@
   </bibliography>
 
 </style>
+
