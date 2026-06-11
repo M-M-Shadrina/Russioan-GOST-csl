@@ -9,7 +9,7 @@
     <title>GOST Russian Journal (custom)</title>
     <title-short>GOST-RJ</title-short>
     <id>http://www.zotero.org/styles/gost-russian-journal-custom</id>
-    <link href="https://raw.githubusercontent.com/M-M-Shadrina/Russioan-GOST-csl/main/gost-russian-journal.csl" rel="self"/>
+    <link href="https://raw.githubusercontent.com/M-M-Shadrina/Russioan-GOST-csl/main/gost-russian-journal-custom.csl" rel="self"/>
     <link href="http://www.zotero.org/styles/gost-r-7-0-5-2008" rel="template"/>
     <author>
       <name>Custom</name>
@@ -51,7 +51,7 @@
   -->
   <locale xml:lang="en">
     <terms>
-      <term name="et-al"></term>
+      <term name="et-al"> et al.</term>
     </terms>
   </locale>
 
@@ -92,6 +92,7 @@
             delimiter=", "
             et-al-min="2"
             et-al-use-first="1"/>
+      <et-al prefix="" suffix=""/>
     </names>
   </macro>
 
@@ -179,3 +180,4 @@
   </bibliography>
 
 </style>
+
