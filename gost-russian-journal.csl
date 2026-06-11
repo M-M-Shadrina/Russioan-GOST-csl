@@ -9,7 +9,7 @@
     <title>GOST Russian Journal (custom)</title>
     <title-short>GOST-RJ</title-short>
     <id>http://www.zotero.org/styles/gost-russian-journal-custom</id>
-    <link href="https://raw.githubusercontent.com/M-M-Shadrina/Russioan-GOST-csl/main/gost-russian-journal-custom.csl" rel="self"/>
+    <link href="https://raw.githubusercontent.com/M-M-Shadrina/Russioan-GOST-csl/main/gost-russian-journal.csl" rel="self"/>
     <link href="http://www.zotero.org/styles/gost-r-7-0-5-2008" rel="template"/>
     <author>
       <name>Custom</name>
@@ -22,51 +22,20 @@
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/"/>
   </info>
 
-  <!--
-  ================================================================
-  DESIGN NOTES:
-
-  In-text citation: [Фамилия et al., год]
-    1 author  → [Smith, 2020]
-    2+ authors → [Smith et al., 2020]
-
-  Bibliography pretitle (before " / "):
-    1–3 authors → first author only, no label
-    4+ authors  → first author only (CSL 1.0 limitation — cannot suppress entirely)
-
-  Bibliography after-slash:
-    1–4 authors → all authors
-    5+ authors  → first 3 + " et al."
-
-  Bibliography order: alphabetical by first author surname.
-  ================================================================
-  -->
-
-  <!--
-    Global et-al term is set to empty so the pretitle macro
-    (which uses et-al-min="2" et-al-use-first="1") never appends
-    any label after the first author name.
-    The after-slash macro and citation block inject " et al." via
-    an explicit prefix attribute on their own <et-al> elements.
-  -->
   <locale xml:lang="en">
     <terms>
       <term name="et-al"> et al.</term>
     </terms>
   </locale>
 
-  <!-- ================================================================
-       MACROS
-  ================================================================ -->
-
-  <!-- Citation author: first surname + " et al." for 2+ -->
+  <!-- Citation author: first surname + et al. for 2+ -->
   <macro name="citation-author">
     <names variable="author">
       <name form="short"
             et-al-min="2"
             et-al-use-first="1"
             delimiter=", "/>
-      <et-al prefix=" et al."/>
+      <et-al term="et-al"/>
     </names>
   </macro>
 
@@ -77,11 +46,7 @@
     </date>
   </macro>
 
-  <!--
-    Pretitle: always exactly one author, no label.
-    The global et-al term is empty, so even when et-al fires (2+ authors)
-    nothing is appended — giving us "Фамилия И. О." for all cases.
-  -->
+  <!-- Pretitle: first author only, no et-al label -->
   <macro name="pretitle-author">
     <names variable="author">
       <name form="long"
@@ -92,11 +57,11 @@
             delimiter=", "
             et-al-min="2"
             et-al-use-first="1"/>
-      <et-al prefix="" suffix=""/>
+      <et-al term="pupunya" prefix="" suffix=""/>
     </names>
   </macro>
 
-  <!-- After-slash: all for 1–4, first 3 + " et al." for 5+ -->
+  <!-- After-slash: all for 1–4, first 3 + et al. for 5+ -->
   <macro name="authors-after-slash">
     <names variable="author">
       <name form="long"
@@ -108,7 +73,7 @@
             et-al-min="5"
             et-al-use-first="3"
             delimiter-precedes-et-al="never"/>
-      <et-al prefix=" et al."/>
+      <et-al term="et-al"/>
     </names>
   </macro>
 
@@ -162,6 +127,7 @@
     </sort>
     <layout suffix=".">
 
+      <!-- Pretitle: first author, no slash after -->
       <group suffix=" ">
         <text macro="pretitle-author"/>
       </group>
@@ -180,4 +146,3 @@
   </bibliography>
 
 </style>
-
