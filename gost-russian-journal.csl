@@ -5,11 +5,19 @@
        demote-non-dropping-particle="sort-only"
        default-locale="en-US">
 
-  <info>
+ <info>
     <title>GOST Russian Journal (custom)</title>
+    <title-short>GOST-RJ</title-short>
     <id>http://www.zotero.org/styles/gost-russian-journal-custom</id>
-    <author><name>Custom</name></author>
+    <link href="http://www.zotero.org/styles/gost-russian-journal-custom" rel="self"/>
+    <link href="http://www.zotero.org/styles/gost-r-7-0-5-2008" rel="template"/>
+    <author>
+      <name>Custom</name>
+      <email>custom@example.com</email>
+    </author>
     <category citation-format="numeric"/>
+    <category field="generic-base"/>
+    <summary>Custom GOST style for Russian journal articles</summary>
     <updated>2026-06-11T00:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/"/>
   </info>
